@@ -1,11 +1,15 @@
 package com.jayway.jsonpath;
 
-import org.junit.Test;
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
-import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JacksonTest extends BaseTest {
 
@@ -27,6 +31,24 @@ public class JacksonTest extends BaseTest {
 
     }
 
+    @Test
+    public void an_object_can_be_mapped_to_pojo_readroot() {
+
+        String json = "{\n" +
+                "   \"foo\" : \"foo\",\n" +
+                "   \"bar\" : 10,\n" +
+                "   \"baz\" : true\n" +
+                "}";
+
+        Object obj  = JsonPath.using(JACKSON_CONFIGURATION_FOR_READROOT).parse(json).readRoot(new String[] {"$"});
+        FooBarBaz fooBarBaz = new ObjectMapper().convertValue(obj, FooBarBaz.class);
+
+        assertThat(fooBarBaz.foo).isEqualTo("foo");
+        assertThat(fooBarBaz.bar).isEqualTo(10L);
+        assertThat(fooBarBaz.baz).isEqualTo(true);
+
+    }
+    
     public static class FooBarBaz {
         public String foo;
         public Long bar;
@@ -52,6 +74,24 @@ public class JacksonTest extends BaseTest {
         final Object readFromSingleQuote = JsonPath.using(JACKSON_CONFIGURATION).parse(jsonArray).read("$.[?(@.foo in ['bar'])].foo");
         final Object readFromDoubleQuote = JsonPath.using(JACKSON_CONFIGURATION).parse(jsonArray).read("$.[?(@.foo in [\"bar\"])].foo");
         assertThat(readFromSingleQuote).isEqualTo(readFromDoubleQuote);
+
+    }
+
+    @Test
+    public void testShallowCopy() throws JsonProcessingException {
+        ObjectMapper m = new ObjectMapper();
+        ObjectNode n1 = m.createObjectNode();
+        n1.put("myInt", 23);
+        ObjectNode n2 = m.createObjectNode();
+        n2.put("name", "adam");
+        n2.put("age", "33");
+        n1.put("person", n2);
+
+        System.out.println(" -- " + m.writeValueAsString(n1));
+        ObjectNode n3 = n1.deepCopy();
+        System.out.println(" -- " + m.writeValueAsString(n3));
+        ((ObjectNode) n3.get("person")).retain();
+        System.out.println(" -- " + m.writeValueAsString(n3));
 
     }
 

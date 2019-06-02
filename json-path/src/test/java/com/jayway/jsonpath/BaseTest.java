@@ -1,5 +1,7 @@
 package com.jayway.jsonpath;
 
+import java.util.HashMap;
+
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.path.PredicateContextImpl;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
@@ -15,8 +17,6 @@ import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JsonSmartMappingProvider;
 import com.jayway.jsonpath.spi.mapper.TapestryMappingProvider;
 
-import java.util.HashMap;
-
 public class BaseTest {
 
     public static final Configuration JSON_ORG_CONFIGURATION = Configuration
@@ -25,23 +25,44 @@ public class BaseTest {
             .jsonProvider(new JsonOrgJsonProvider())
             .build();
 
+    public static final Configuration JSON_ORG_CONFIGURATION_FOR_READROOT = Configuration
+            .builder()
+            .mappingProvider(new JsonOrgMappingProvider())
+            .jsonProvider(new JsonOrgJsonProvider())
+            .build();
+    
     public static final Configuration GSON_CONFIGURATION = Configuration
             .builder()
             .mappingProvider(new GsonMappingProvider())
             .jsonProvider(new GsonJsonProvider())
             .build();
 
+    public static final Configuration GSON_CONFIGURATION_FOR_READ_ROOT = Configuration
+            .builder()
+            .mappingProvider(new GsonMappingProvider())
+            .jsonProvider(new GsonJsonProvider())
+            .build();
+    
     public static final Configuration JACKSON_CONFIGURATION = Configuration
             .builder()
             .mappingProvider(new JacksonMappingProvider())
             .jsonProvider(new JacksonJsonProvider())
             .build();
 
+    public static final Configuration JACKSON_CONFIGURATION_FOR_READROOT = Configuration
+            .builder()
+            .mappingProvider(new JacksonMappingProvider())
+            .jsonProvider(new JacksonJsonProvider())
+            .build();
+    
     public static final Configuration JACKSON_JSON_NODE_CONFIGURATION = Configuration
             .builder()
             .mappingProvider(new JacksonMappingProvider())
             .jsonProvider(new JacksonJsonNodeJsonProvider())
             .build();
+
+    public static final Configuration JACKSON_JSON_NODE_CONFIGURATION_FOR_READROOT = Configuration.builder()
+            .mappingProvider(new JacksonMappingProvider()).jsonProvider(new JacksonJsonNodeJsonProvider()).build();
 
     public static final Configuration JETTISON_CONFIGURATION = Configuration
             .builder()
@@ -53,7 +74,7 @@ public class BaseTest {
             .mappingProvider(new JsonSmartMappingProvider())
             .jsonProvider(new JsonSmartJsonProvider())
             .build();
-    
+
     public static final Configuration TAPESTRY_JSON_CONFIGURATION = Configuration
         .builder()
         .mappingProvider(new TapestryMappingProvider())

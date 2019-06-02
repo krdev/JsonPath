@@ -14,6 +14,14 @@
  */
 package com.jayway.jsonpath.internal.path;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.internal.EvaluationAbortException;
 import com.jayway.jsonpath.internal.EvaluationContext;
@@ -21,10 +29,6 @@ import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathRef;
 import com.jayway.jsonpath.internal.function.ParamType;
 import com.jayway.jsonpath.internal.function.Parameter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 public class CompiledPath implements Path {
 
@@ -103,6 +107,26 @@ public class CompiledPath implements Path {
     }
 
     @Override
+    public EvaluationContextImpl evaluate(Object rootObj, Object document, Object rootDocument, Configuration configuration) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Evaluating path: {}", toString());
+        }
+
+        EvaluationContextImpl ctx = new EvaluationContextImpl(this, rootDocument, configuration, true);
+        if (null != rootObj) {
+            ctx.setRoot(rootObj);
+        }
+        try {
+            PathRef op = ctx.forUpdate() ? PathRef.createRoot(rootDocument) : PathRef.NO_OP;
+            root.evaluate("", op, document, ctx);
+        } catch (EvaluationAbortException abort) {
+        	throw abort;
+        }
+
+        return ctx;
+    }
+
+    @Override
     public EvaluationContext evaluate(Object document, Object rootDocument, Configuration configuration){
         return evaluate(document, rootDocument, configuration, false);
     }
@@ -120,5 +144,17 @@ public class CompiledPath implements Path {
     @Override
     public String toString() {
         return root.toString();
+    }
+    
+    /**
+     * Fetches the relational expression values from this path.
+     *
+     * @return EvaluationContext containing results of evaluation
+     */
+	@Override
+    public List<SimpleEntry<String, String>> getRelationalExprValues(){
+    	final List<SimpleEntry<String, String>> valuesMap = new ArrayList<SimpleEntry<String, String>>();
+    	root.next().getRelationalExprValues(valuesMap);
+    	return valuesMap;
     }
 }

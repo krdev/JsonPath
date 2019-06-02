@@ -14,10 +14,10 @@
  */
 package com.jayway.jsonpath.spi.json;
 
-import com.jayway.jsonpath.InvalidJsonException;
-
 import java.io.InputStream;
 import java.util.Collection;
+
+import com.jayway.jsonpath.InvalidJsonException;
 
 public interface JsonProvider {
 
@@ -163,4 +163,21 @@ public interface JsonProvider {
      * @return the unwrapped value.
      */
     Object unwrap(Object obj);
+
+    /**
+     * Creates a shallow copy of the object.
+     *
+     * @param obj object to be copied
+     * @return copied object
+     */
+    Object copy(Object obj);
+
+    /**
+     * Extracts a value from obj
+     *
+     * @param obj - a map or an array
+     * @param key property key
+     * @return the map or array entry or {@link com.jayway.jsonpath.spi.json.JsonProvider#UNDEFINED} for missing properties
+     */
+    Object getProperty(Object obj, Object key);
 }

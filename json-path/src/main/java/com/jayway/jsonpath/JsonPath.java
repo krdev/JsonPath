@@ -15,6 +15,20 @@
 package com.jayway.jsonpath;
 
 
+import static com.jayway.jsonpath.Option.ALWAYS_RETURN_LIST;
+import static com.jayway.jsonpath.Option.AS_PATH_LIST;
+import static com.jayway.jsonpath.internal.Utils.isTrue;
+import static com.jayway.jsonpath.internal.Utils.notEmpty;
+import static com.jayway.jsonpath.internal.Utils.notNull;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
+
 import com.jayway.jsonpath.internal.EvaluationContext;
 import com.jayway.jsonpath.internal.ParseContextImpl;
 import com.jayway.jsonpath.internal.Path;
@@ -22,16 +36,6 @@ import com.jayway.jsonpath.internal.PathRef;
 import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.internal.path.PathCompiler;
 import com.jayway.jsonpath.spi.json.JsonProvider;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import static com.jayway.jsonpath.Option.ALWAYS_RETURN_LIST;
-import static com.jayway.jsonpath.Option.AS_PATH_LIST;
-import static com.jayway.jsonpath.internal.Utils.*;
 
 /**
  * <p/>
@@ -209,6 +213,16 @@ public class JsonPath {
             }
         }
     }
+
+    /**
+     * Fetches a list of left and right {@link SimpleEntry} values of relational expressions in the path.
+     *
+     * @return List of {@link SimpleEntry} objects with left and right values in relational expressions in the path.
+     */
+    public List<SimpleEntry<String, String>> getRelationalExprValues() {
+        return path.getRelationalExprValues();
+    }
+    
 
     /**
      * Set the value this path points to in the provided jsonObject
@@ -693,5 +707,19 @@ public class JsonPath {
         } else {
             return (T) jsonObject;
         }
+    }
+
+
+    /**
+     * Applies this JsonPath to the provided json document. Note that the document must be identified as either a List or Map by the
+     * {@link JsonProvider}
+     *
+     * @param jsonObject a container Object
+     * @param configuration configuration to use
+     * @return the root object matched by the given path
+     */
+    public Object readRoot(Object rootObj, Object jsonObject, Configuration configuration) {
+        configuration.setComputeRoot(true);
+        return path.evaluate(rootObj, jsonObject, jsonObject, configuration).getRoot();
     }
 }
